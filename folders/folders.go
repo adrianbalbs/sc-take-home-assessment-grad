@@ -20,10 +20,14 @@ func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
 	return &FetchFolderResponse{Folders: r}, nil
 }
 
+// Retrives all the folders and then filters out the folders which do not match
+// the given orgID
+//   - We can preallocate resFolder to have the size of folders if we know that the size
+//     of the returned folders could be at most the size of the sample data retrieved.
 func FetchAllFoldersByOrgID(orgID uuid.UUID) ([]*Folder, error) {
 	folders := GetSampleData()
 
-	resFolder := []*Folder{}
+	resFolder := make([]*Folder, 0, len(folders))
 	for _, folder := range folders {
 		if folder.OrgId == orgID {
 			resFolder = append(resFolder, folder)

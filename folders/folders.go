@@ -15,12 +15,13 @@ import (
 //     the data, since the response from FetchAllFoldersByOrgID has already retrived all of the data
 //   - We can also remove the ffr variable instantiated
 //     and instead, directly return the FetchFolderResponse
+//   - Original variable names are not very descriptive and should be changed, e.g. "r" to "folders"
 func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
-	r, err := FetchAllFoldersByOrgID(req.OrgID)
+	folders, err := FetchAllFoldersByOrgID(req.OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &FetchFolderResponse{Folders: r}, nil
+	return &FetchFolderResponse{Folders: folders}, nil
 }
 
 // Retrives all the folders and then filters out the folders which do not match

@@ -2,6 +2,7 @@ package folders
 
 import (
 	"encoding/base64"
+	"fmt"
 	"strconv"
 
 	"github.com/gofrs/uuid"
@@ -21,7 +22,10 @@ type FetchFoldersPaginatedResponse struct {
 }
 
 func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPaginatedResponse, error) {
-	// TODO: Deal with negative limits but assume that a user won't pass a negative limit
+	if req.Limit <= 0 {
+		return nil, fmt.Errorf("limit must be greater than 0")
+	}
+
 	start := 0
 	if req.Token != "" {
 		index, err := decodeNextIndex(req.Token)

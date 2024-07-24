@@ -1,6 +1,8 @@
 package folders
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -9,9 +11,10 @@ import (
 //   - Remove any instances of unused variable declarations
 //   - There was a bug in the second for loop where the address of &v1
 //     never changes, causing the same Folder item to be appended to the list each time
-//   - We can remove both for loops as it is unecessary to instantiate multiple lists, since
-//     the response from FetchAllFoldersByOrgID has already retrived all of the data
-//   - We can also remove the ffr variable instantiated, and instead directly return the FetchFolderResponse
+//   - We can remove both for loops as it is unecessary to instantiate multiple lists and re-process
+//     the data, since the response from FetchAllFoldersByOrgID has already retrived all of the data
+//   - We can also remove the ffr variable instantiated
+//     and instead, directly return the FetchFolderResponse
 func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
 	r, err := FetchAllFoldersByOrgID(req.OrgID)
 	if err != nil {
@@ -24,7 +27,12 @@ func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
 // the given orgID
 //   - We can preallocate resFolder to have the size of folders if we know that the size
 //     of the returned folders could be at most the size of the sample data retrieved.
+//   - We should handle the case where the UUID passed into the function is potentially Nil
+//     and return an error accordingly
 func FetchAllFoldersByOrgID(orgID uuid.UUID) ([]*Folder, error) {
+	if orgID == uuid.Nil {
+		return nil, fmt.Errorf("invalid orgID: Nil UUID")
+	}
 	folders := GetSampleData()
 
 	resFolder := make([]*Folder, 0, len(folders))

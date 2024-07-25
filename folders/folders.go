@@ -16,7 +16,12 @@ import (
 //   - We can also remove the ffr variable instantiated
 //     and instead, directly return the FetchFolderResponse
 //   - Original variable names are not very descriptive and should be changed, e.g. "r" to "folders"
+//   - Do error handling for when the request passed to the function is nil and deal with
+//     any propagating errors from FetchAllFoldersByOrgID
 func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("invalid request: request cannot be nil")
+	}
 	folders, err := FetchAllFoldersByOrgID(req.OrgID)
 	if err != nil {
 		return nil, err

@@ -37,6 +37,10 @@ type FetchFoldersPaginatedResponse struct {
 }
 
 func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPaginatedResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("invalid request: request cannot be nil")
+	}
+
 	if req.Limit <= 0 {
 		return nil, fmt.Errorf("limit must be greater than 0")
 	}

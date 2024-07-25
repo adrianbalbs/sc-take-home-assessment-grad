@@ -42,6 +42,12 @@ func Test_GetAllFolders(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, res)
 	})
+
+	t.Run("returns error when request is nil", func(t *testing.T) {
+		res, err := folders.GetAllFolders(nil)
+		assert.Error(t, err)
+		assert.Nil(t, res)
+	})
 }
 
 func Test_EncodeNextCursor(t *testing.T) {
@@ -90,6 +96,12 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 			Limit:  5,
 			Cursor: "",
 		})
+		assert.Error(t, err)
+		assert.Nil(t, res)
+	})
+
+	t.Run("returns error when req is nil", func(t *testing.T) {
+		res, err := folders.GetAllFoldersPaginated(nil)
 		assert.Error(t, err)
 		assert.Nil(t, res)
 	})

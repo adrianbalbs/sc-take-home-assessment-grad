@@ -8,8 +8,6 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// Copy over the `GetFolders` and `FetchAllFoldersByOrgID` to get started
-
 type FetchFoldersPaginatedRequest struct {
 	Token string
 	Limit int
@@ -28,7 +26,7 @@ func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPag
 
 	start := 0
 	if req.Token != "" {
-		index, err := decodeNextIndex(req.Token)
+		index, err := DecodeNextIndex(req.Token)
 		if err != nil {
 			return nil, err
 		}
@@ -47,17 +45,17 @@ func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPag
 
 	nextToken := ""
 	if end != len(folders) {
-		nextToken = encodeNextIndex(end)
+		nextToken = EncodeNextIndex(end)
 	}
 
 	return &FetchFoldersPaginatedResponse{Folders: folders[start:end], NextToken: nextToken}, nil
 }
 
-func encodeNextIndex(nextIndex int) string {
+func EncodeNextIndex(nextIndex int) string {
 	return base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(nextIndex)))
 }
 
-func decodeNextIndex(token string) (int, error) {
+func DecodeNextIndex(token string) (int, error) {
 	decodedToken, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		return 0, err
@@ -69,4 +67,3 @@ func decodeNextIndex(token string) (int, error) {
 
 	return index, nil
 }
-

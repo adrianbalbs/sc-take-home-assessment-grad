@@ -1,7 +1,7 @@
 package folders
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/gofrs/uuid"
 )
@@ -20,7 +20,7 @@ import (
 //     any propagating errors from FetchAllFoldersByOrgID
 func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
 	if req == nil {
-		return nil, fmt.Errorf("invalid request: request cannot be nil")
+		return nil, errors.New("invalid request: request cannot be nil")
 	}
 	folders, err := FetchAllFoldersByOrgID(req.OrgID)
 	if err != nil {
@@ -37,7 +37,7 @@ func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
 //     and return an error accordingly
 func FetchAllFoldersByOrgID(orgID uuid.UUID) ([]*Folder, error) {
 	if orgID == uuid.Nil {
-		return nil, fmt.Errorf("invalid orgID: Nil UUID")
+		return nil, errors.New("invalid orgID: Nil UUID")
 	}
 	folders := GetSampleData()
 

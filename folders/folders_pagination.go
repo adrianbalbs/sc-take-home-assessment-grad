@@ -2,7 +2,7 @@ package folders
 
 import (
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -38,11 +38,11 @@ type FetchFoldersPaginatedResponse struct {
 
 func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPaginatedResponse, error) {
 	if req == nil {
-		return nil, fmt.Errorf("invalid request: request cannot be nil")
+		return nil, errors.New("invalid request: request cannot be nil")
 	}
 
 	if req.Limit <= 0 {
-		return nil, fmt.Errorf("limit must be greater than 0")
+		return nil, errors.New("limit must be greater than 0")
 	}
 
 	start := 0

@@ -9,6 +9,22 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// Explanation of Solution:
+//
+// I decided to go with a cursor-based approach for implementing pagination. The reason I went
+// with this implementation is that compared to offset-pagination, we can directly index on
+// the next set of data to be fetched rather than linearly search for the offset that
+// we want to start on.
+//
+// A user sends a request payload with the orgID, a limit for how many folders are to
+// be fetched (which should be an integer greater than 0), and a base64 encoded cursor token,
+// which is either empty or contains the encoded starting index of the next set of folders. Calling
+// the FetchFoldersPaginatedRequest function returns a slice of the Folders from the starting index up
+// to the ending offset index (which is just start + limit), and the encoded cursor pointing to the starting
+// index of the next set of folders to be retrieved. If the cursor token passed into the function is empty,
+// then we default to searching from the beginning of the slice. The function is repeatedly called
+// until we reach the end of the slice, where the cursor returned is an empty string.
+
 type FetchFoldersPaginatedRequest struct {
 	Cursor string
 	Limit  int

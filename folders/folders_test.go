@@ -1,6 +1,7 @@
 package folders_test
 
 import (
+	"encoding/base64"
 	"testing"
 
 	"github.com/georgechieng-sc/interns-2022/folders"
@@ -40,6 +41,34 @@ func Test_GetAllFolders(t *testing.T) {
 			})
 		assert.Error(t, err)
 		assert.Nil(t, res)
+	})
+}
+
+func Test_EncodeNextCursor(t *testing.T) {
+	t.Run("encoded index matches base64 encoding", func(t *testing.T) {
+		assert.Equal(t, "bmV4dF9jdXJzb3I6NQ==", folders.EncodeNextCursor(5))
+	})
+}
+
+func Test_DecodeNextCursor(t *testing.T) {
+	t.Run("returns an error when given an invalid base64 string", func(t *testing.T) {
+		res, err := folders.DecodeNextCursor("token")
+		assert.Zero(t, res)
+		assert.Error(t, err)
+	})
+
+	t.Run("returns error when index cannot be parsed as an integer", func(t *testing.T) {
+		token := base64.StdEncoding.EncodeToString([]byte("next_cursor:" + "token"))
+		res, err := folders.DecodeNextCursor(token)
+		assert.Zero(t, res)
+		assert.Error(t, err)
+	})
+
+	t.Run("succesfully returns decoded index", func(t *testing.T) {
+		encoded := folders.EncodeNextCursor(5)
+		res, err := folders.DecodeNextCursor(encoded)
+		assert.Equal(t, 5, res)
+		assert.NoError(t, err)
 	})
 }
 
@@ -124,7 +153,7 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 		orgID := uuid.FromStringOrNil(folders.DefaultOrgID)
 
 		expected, _ := folders.FetchAllFoldersByOrgID(orgID)
-		nextToken := folders.EncodeNextIndex(len(expected) - 3)
+		nextToken := folders.EncodeNextCursor(len(expected) - 3)
 
 		res, err := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
 			OrgID:  orgID,

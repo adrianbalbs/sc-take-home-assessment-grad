@@ -27,7 +27,7 @@ func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPag
 
 	start := 0
 	if req.Cursor != "" {
-		index, err := DecodeNextIndex(req.Cursor)
+		index, err := DecodeNextCursor(req.Cursor)
 		if err != nil {
 			return nil, err
 		}
@@ -46,23 +46,23 @@ func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPag
 
 	nextCursor := ""
 	if end != len(folders) {
-		nextCursor = EncodeNextIndex(end)
+		nextCursor = EncodeNextCursor(end)
 	}
 
 	return &FetchFoldersPaginatedResponse{Folders: folders[start:end], NextCursor: nextCursor}, nil
 }
 
-func EncodeNextIndex(endIndex int) string {
+func EncodeNextCursor(endIndex int) string {
 	return base64.StdEncoding.EncodeToString([]byte("next_cursor:" + strconv.Itoa(endIndex)))
 }
 
-func DecodeNextIndex(token string) (int, error) {
-	decodedToken, err := base64.StdEncoding.DecodeString(token)
+func DecodeNextCursor(encodedCursor string) (int, error) {
+	decodedCursor, err := base64.StdEncoding.DecodeString(encodedCursor)
 	if err != nil {
 		return 0, err
 	}
 
-	index, err := strconv.Atoi(strings.Split(string(decodedToken), ":")[1])
+	index, err := strconv.Atoi(strings.Split(string(decodedCursor), ":")[1])
 	if err != nil {
 		return 0, err
 	}

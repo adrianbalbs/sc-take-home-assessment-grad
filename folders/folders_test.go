@@ -47,9 +47,9 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 	t.Run("returns error when index is less than or equal to 0", func(t *testing.T) {
 		orgID := uuid.FromStringOrNil(folders.DefaultOrgID)
 		res, err := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
-			OrgID: orgID,
-			Limit: -1,
-			Token: "",
+			OrgID:  orgID,
+			Limit:  -1,
+			Cursor: "",
 		})
 		assert.Error(t, err)
 		assert.Nil(t, res)
@@ -57,9 +57,9 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 
 	t.Run("returns error when orgID is nil", func(t *testing.T) {
 		res, err := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
-			OrgID: uuid.Nil,
-			Limit: 5,
-			Token: "",
+			OrgID:  uuid.Nil,
+			Limit:  5,
+			Cursor: "",
 		})
 		assert.Error(t, err)
 		assert.Nil(t, res)
@@ -68,9 +68,9 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 	t.Run("returns an error when given an invalid base64 token", func(t *testing.T) {
 		orgID := uuid.FromStringOrNil(folders.DefaultOrgID)
 		res, err := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
-			OrgID: orgID,
-			Limit: 5,
-			Token: "token",
+			OrgID:  orgID,
+			Limit:  5,
+			Cursor: "token",
 		})
 		assert.Error(t, err)
 		assert.Nil(t, res)
@@ -79,9 +79,9 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 	t.Run("returns no folders when orgID does not match", func(t *testing.T) {
 		orgID := uuid.Must(uuid.NewV4())
 		res, err := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
-			OrgID: orgID,
-			Limit: 5,
-			Token: "",
+			OrgID:  orgID,
+			Limit:  5,
+			Cursor: "",
 		})
 		assert.NoError(t, err)
 		assert.Empty(t, res.Folders)
@@ -90,9 +90,9 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 	t.Run("fetches first 5 folders", func(t *testing.T) {
 		orgID := uuid.FromStringOrNil(folders.DefaultOrgID)
 		res, err := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
-			OrgID: orgID,
-			Limit: 5,
-			Token: "",
+			OrgID:  orgID,
+			Limit:  5,
+			Cursor: "",
 		})
 
 		assert.NoError(t, err)
@@ -104,15 +104,15 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 	t.Run("fetches first 5 folders then the next 5 folders", func(t *testing.T) {
 		orgID := uuid.FromStringOrNil(folders.DefaultOrgID)
 		first, _ := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
-			OrgID: orgID,
-			Limit: 5,
-			Token: "",
+			OrgID:  orgID,
+			Limit:  5,
+			Cursor: "",
 		})
 
 		second, err := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
-			OrgID: orgID,
-			Limit: 5,
-			Token: first.NextToken,
+			OrgID:  orgID,
+			Limit:  5,
+			Cursor: first.NextCursor,
 		})
 
 		expected, _ := folders.FetchAllFoldersByOrgID(orgID)
@@ -127,9 +127,9 @@ func Test_GetAllFoldersPagination(t *testing.T) {
 		nextToken := folders.EncodeNextIndex(len(expected) - 3)
 
 		res, err := folders.GetAllFoldersPaginated(&folders.FetchFoldersPaginatedRequest{
-			OrgID: orgID,
-			Limit: 5,
-			Token: nextToken,
+			OrgID:  orgID,
+			Limit:  5,
+			Cursor: nextToken,
 		})
 
 		assert.NoError(t, err)

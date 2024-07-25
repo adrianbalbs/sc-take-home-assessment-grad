@@ -4,19 +4,20 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gofrs/uuid"
 )
 
 type FetchFoldersPaginatedRequest struct {
-	Token string
-	Limit int
-	OrgID uuid.UUID
+	Cursor string
+	Limit  int
+	OrgID  uuid.UUID
 }
 
 type FetchFoldersPaginatedResponse struct {
-	NextToken string
-	Folders   []*Folder
+	NextCursor string
+	Folders    []*Folder
 }
 
 func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPaginatedResponse, error) {
@@ -25,8 +26,8 @@ func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPag
 	}
 
 	start := 0
-	if req.Token != "" {
-		index, err := DecodeNextIndex(req.Token)
+	if req.Cursor != "" {
+		index, err := DecodeNextIndex(req.Cursor)
 		if err != nil {
 			return nil, err
 		}
@@ -43,16 +44,16 @@ func GetAllFoldersPaginated(req *FetchFoldersPaginatedRequest) (*FetchFoldersPag
 		end = len(folders)
 	}
 
-	nextToken := ""
+	nextCursor := ""
 	if end != len(folders) {
-		nextToken = EncodeNextIndex(end)
+		nextCursor = EncodeNextIndex(end)
 	}
 
-	return &FetchFoldersPaginatedResponse{Folders: folders[start:end], NextToken: nextToken}, nil
+	return &FetchFoldersPaginatedResponse{Folders: folders[start:end], NextCursor: nextCursor}, nil
 }
 
-func EncodeNextIndex(nextIndex int) string {
-	return base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(nextIndex)))
+func EncodeNextIndex(endIndex int) string {
+	return base64.StdEncoding.EncodeToString([]byte("next_cursor:" + strconv.Itoa(endIndex)))
 }
 
 func DecodeNextIndex(token string) (int, error) {
@@ -60,7 +61,8 @@ func DecodeNextIndex(token string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	index, err := strconv.Atoi(string(decodedToken))
+
+	index, err := strconv.Atoi(strings.Split(string(decodedToken), ":")[1])
 	if err != nil {
 		return 0, err
 	}
